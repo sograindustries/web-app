@@ -1,7 +1,12 @@
 import * as React from 'react';
+import LoginForm from './LoginForm';
 
 function LoginPage() {
-    return <div>Login</div>;
+    return (
+        <div>
+            <LoginForm />
+        </div>
+    );
 }
 
 export default LoginPage;

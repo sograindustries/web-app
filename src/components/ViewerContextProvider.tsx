@@ -2,18 +2,20 @@ import * as React from 'react';
 import { Action } from '../reducers/app';
 
 interface Viewer {
-    uuid: string;
-    token: string;
+    username: string;
+    jwt: string;
 }
 
-type ViewerAction = Action<'set_viewer', Viewer>;
+type ViewerAction = Action<'set_viewer', Viewer | null>;
 
 function viewer(state: Viewer | null = null, action: ViewerAction): Viewer | null {
     switch (action.type) {
         case 'set_viewer':
-            return {
-                ...action.payload,
-            };
+            return action.payload
+                ? {
+                      ...action.payload,
+                  }
+                : null;
         default:
             return state;
     }
@@ -21,7 +23,7 @@ function viewer(state: Viewer | null = null, action: ViewerAction): Viewer | nul
 
 export const ViewerContext = React.createContext<{
     viewer: Viewer | null;
-    setViewer: (viewer: Viewer) => void;
+    setViewer: (viewer: Viewer | null) => void;
 }>({ viewer: null, setViewer: () => {} });
 
 export const ViewerProvider = ViewerContext.Provider;
@@ -30,7 +32,7 @@ export const ViewerConsumer = ViewerContext.Consumer;
 export default function ViewerContextProvider(props: { children: React.ReactNode }) {
     const [state, dispatch] = React.useReducer(viewer, null);
 
-    const setViewer = (viewer: Viewer) => {
+    const setViewer = (viewer: Viewer | null) => {
         dispatch({ type: 'set_viewer', payload: viewer });
     };
 

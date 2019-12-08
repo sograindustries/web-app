@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { makeStyles, Avatar, Typography, TextField, Button, Grid, Link, Container } from '@material-ui/core';
 import { LockOutlined as LockOutlinedIcon } from '@material-ui/icons';
+import { WithApiProps, withApi } from '../api/hoc';
+import { ViewerContext } from './ViewerContextProvider';
+import { useHistory } from 'react-router';
+import { ROUTE_HOME } from '../App';
 
 const useStyles = makeStyles(theme => ({
     paper: {
@@ -23,8 +27,19 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const LoginForm = () => {
+const LoginForm = (props: WithApiProps) => {
     const classes = useStyles();
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const { setViewer } = React.useContext(ViewerContext);
+    const history = useHistory();
+
+    const handleOnSignIn = async () => {
+        const viewer = await props.api.auth.login(email, password);
+        setViewer(viewer);
+        history.push(ROUTE_HOME);
+    };
+
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.paper}>
@@ -45,6 +60,10 @@ const LoginForm = () => {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        value={email}
+                        onChange={e => {
+                            setEmail(e.target.value);
+                        }}
                     />
                     <TextField
                         variant="outlined"
@@ -56,8 +75,18 @@ const LoginForm = () => {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        value={password}
+                        onChange={e => {
+                            setPassword(e.target.value);
+                        }}
                     />
-                    <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                        onClick={handleOnSignIn}
+                    >
                         Sign In
                     </Button>
                     <Grid container>
@@ -78,4 +107,4 @@ const LoginForm = () => {
     );
 };
 
-export default LoginForm;
+export default withApi(LoginForm);

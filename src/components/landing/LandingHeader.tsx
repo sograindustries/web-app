@@ -3,7 +3,7 @@ import { makeStyles, Typography } from '@material-ui/core';
 import Logo from '../base/Logo';
 
 const useStyles = makeStyles(() => ({
-    root: { display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end' },
+    root: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' },
     title: {
         display: 'flex',
         alignItems: 'center',
@@ -17,10 +17,12 @@ function LandingHeader() {
         <div className={classes.root}>
             <div className={classes.title}>
                 <Logo size="md" />
-                <Typography variant="h2">ARGOS HEALTH</Typography>
+                <Typography variant="h2" noWrap={true}>
+                    ARGOS HEALTH
+                </Typography>
             </div>
 
-            <Typography variant="h5" style={{ color: '#a2a2a2' }}>
+            <Typography variant="h6" style={{ color: '#a2a2a2' }}>
                 Never Miss a Beat.
             </Typography>
         </div>

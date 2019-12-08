@@ -1,23 +1,29 @@
 import * as React from 'react';
-import { Container, CssBaseline, makeStyles, Paper, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import LandingHeader from './LandingHeader';
+import AppBar from './AppBar';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
     root: {
-        display: 'flex',
-        justifyContent: 'center',
+        height: 'inherit',
+    },
+    container: {
         alignItems: 'center',
-        height: '100vh',
+        display: 'flex',
+        height: '80%',
+        justifyContent: 'center',
     },
 }));
 
 function LandingPage() {
     const classes = useStyles();
     return (
-        <Container className={classes.root} maxWidth="xl">
-            <CssBaseline />
-            <LandingHeader />
-        </Container>
+        <div className={classes.root}>
+            <AppBar />
+            <div className={classes.container}>
+                <LandingHeader />
+            </div>
+        </div>
     );
 }
 

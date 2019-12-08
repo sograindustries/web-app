@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const img = require('../../../assets/logo.png');
+import logo from '../../assets/logo.png';
+
 interface Props {
     size: 'sm' | 'md' | 'lg';
 }
@@ -18,7 +22,7 @@ function Logo(props: Props) {
             size = 160;
             break;
     }
-    return <img src={'../../../assets/logo.png'} width={size} />;
+    return <img src={logo} width={size} />;
 }
 
 export default Logo;
