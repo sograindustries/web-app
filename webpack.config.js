@@ -1,12 +1,19 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Dotenv = require('dotenv-webpack');
+
 module.exports = {
     mode: 'development',
 
     output: {
         path: __dirname + '/dist',
         filename: 'bundle.js',
+    },
+
+    devServer: {
+        historyApiFallback: true,
     },
 
     // Enable sourcemaps for debugging webpack's output.
@@ -38,6 +45,7 @@ module.exports = {
     },
 
     plugins: [
+        new Dotenv(),
         new HtmlWebpackPlugin({
             template: './src/index.html',
         }),

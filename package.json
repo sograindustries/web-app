@@ -5,11 +5,21 @@
     "author": "Farmer 001",
     "license": "MIT",
     "scripts": {
+        "watch": "webpack-dev-server",
+        "build": "webpack",
+        "invalidate-web": "aws cloudfront create-invalidation --distribution-id E28P079HCMDAYV --paths \"/*\"",
+        "deploy": "rm -rf build && yarn build && aws s3 cp dist s3://argosheart.com --recursive && yarn invalidate-web",
+        "codegen": "graphql-codegen",
         "lint": "tsc --noEmit && eslint 'src/*/**/*.{js,ts,tsx}' --quiet --fix"
     },
     "devDependencies": {
+        "@graphql-codegen/cli": "^1.9.1",
+        "@graphql-codegen/typescript": "^1.9.1",
+        "@graphql-codegen/typescript-operations": "^1.9.1",
+        "@graphql-codegen/typescript-react-apollo": "^1.9.1",
         "@types/react": "^16.9.13",
         "@types/react-dom": "^16.9.4",
+        "@types/react-router-dom": "^5.1.3",
         "@typescript-eslint/eslint-plugin": "^2.9.0",
         "@typescript-eslint/parser": "^2.9.0",
         "eslint": "^6.7.2",
@@ -28,7 +38,24 @@
         "webpack-dev-server": "^3.9.0"
     },
     "dependencies": {
+        "@apollo/react-hoc": "^3.1.3",
+        "@apollo/react-hooks": "^3.1.3",
+        "@material-ui/core": "^4.7.0",
+        "@material-ui/icons": "^4.5.1",
+        "apollo-cache-inmemory": "^1.6.3",
+        "apollo-client": "^2.6.4",
+        "apollo-link": "^1.2.13",
+        "apollo-link-http": "^1.5.16",
+        "dotenv-webpack": "^1.7.0",
+        "graphql": "^14.5.8",
+        "graphql-tag": "^2.10.1",
         "react": "^16.12.0",
-        "react-dom": "^16.12.0"
+        "react-dom": "^16.12.0",
+        "react-redux": "^7.1.3",
+        "react-router": "^5.1.2",
+        "react-router-dom": "^5.1.2",
+        "redux": "^4.0.4",
+        "redux-thunk": "^2.3.0",
+        "typesafe-actions": "^5.1.0"
     }
 }
