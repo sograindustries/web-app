@@ -35,8 +35,8 @@ function App(props: WithApiProps) {
     return (
         <Router>
             <Switch>
-                <Route path={ROUTE_LOGIN} component={LoginPage} />
                 <PrivateRoute path={ROUTE_HOME} component={HomePage} />
+                <Route path={ROUTE_LOGIN} component={LoginPage} />
                 <Route path={ROUTE_LANDING} component={LandingPage} />
             </Switch>
         </Router>
