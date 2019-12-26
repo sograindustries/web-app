@@ -59,6 +59,7 @@ export type Mutation = {
   updatePatch?: Maybe<UpdatePatchPayload>,
   createPatch?: Maybe<CreatePatchPayload>,
   createReading?: Maybe<CreateReadingPayload>,
+  setPatchMode?: Maybe<SetPatchModePayload>,
   version?: Maybe<Scalars['String']>,
 };
 
@@ -77,6 +78,11 @@ export type MutationCreateReadingArgs = {
   input: CreateReadingInput
 };
 
+
+export type MutationSetPatchModeArgs = {
+  input: SetPatchModeInput
+};
+
 export type Patch = {
    __typename?: 'Patch',
   id: Scalars['Int'],
@@ -88,6 +94,7 @@ export type Patch = {
   mobileDevice?: Maybe<Scalars['String']>,
   readingCount?: Maybe<Scalars['Int']>,
   readings?: Maybe<Array<Reading>>,
+  mode?: Maybe<Scalars['String']>,
 };
 
 export type Query = {
@@ -121,6 +128,18 @@ export type Reading = {
   tags?: Maybe<Array<Scalars['String']>>,
 };
 
+/** Creates a reading for a given patch. */
+export type SetPatchModeInput = {
+  patchId?: Maybe<Scalars['Int']>,
+  mode?: Maybe<Scalars['String']>,
+};
+
+export type SetPatchModePayload = {
+   __typename?: 'SetPatchModePayload',
+  id: Scalars['Int'],
+  mode?: Maybe<Scalars['String']>,
+};
+
 /** Updates patch of provided ID. */
 export type UpdatePatchInput = {
   id: Scalars['Int'],
@@ -148,6 +167,20 @@ export type UserPatchArgs = {
   id: Scalars['Int']
 };
 
+export type GetViewerPatchesQueryVariables = {};
+
+
+export type GetViewerPatchesQuery = (
+  { __typename?: 'Query' }
+  & { viewer: Maybe<(
+    { __typename?: 'User' }
+    & { patches: Array<(
+      { __typename?: 'Patch' }
+      & Pick<Patch, 'bleId' | 'mode'>
+    )> }
+  )> }
+);
+
 export type GetViewerQueryVariables = {};
 
 
@@ -160,6 +193,58 @@ export type GetViewerQuery = (
 );
 
 
+export const GetViewerPatchesDocument = gql`
+    query GetViewerPatches {
+  viewer {
+    patches {
+      bleId
+      mode
+    }
+  }
+}
+    `;
+export type GetViewerPatchesComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<GetViewerPatchesQuery, GetViewerPatchesQueryVariables>, 'query'>;
+
+    export const GetViewerPatchesComponent = (props: GetViewerPatchesComponentProps) => (
+      <ApolloReactComponents.Query<GetViewerPatchesQuery, GetViewerPatchesQueryVariables> query={GetViewerPatchesDocument} {...props} />
+    );
+    
+export type GetViewerPatchesProps<TChildProps = {}> = ApolloReactHoc.DataProps<GetViewerPatchesQuery, GetViewerPatchesQueryVariables> | TChildProps;
+export function withGetViewerPatches<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetViewerPatchesQuery,
+  GetViewerPatchesQueryVariables,
+  GetViewerPatchesProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, GetViewerPatchesQuery, GetViewerPatchesQueryVariables, GetViewerPatchesProps<TChildProps>>(GetViewerPatchesDocument, {
+      alias: 'getViewerPatches',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetViewerPatchesQuery__
+ *
+ * To run a query within a React component, call `useGetViewerPatchesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetViewerPatchesQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetViewerPatchesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetViewerPatchesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetViewerPatchesQuery, GetViewerPatchesQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetViewerPatchesQuery, GetViewerPatchesQueryVariables>(GetViewerPatchesDocument, baseOptions);
+      }
+export function useGetViewerPatchesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetViewerPatchesQuery, GetViewerPatchesQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetViewerPatchesQuery, GetViewerPatchesQueryVariables>(GetViewerPatchesDocument, baseOptions);
+        }
+export type GetViewerPatchesQueryHookResult = ReturnType<typeof useGetViewerPatchesQuery>;
+export type GetViewerPatchesLazyQueryHookResult = ReturnType<typeof useGetViewerPatchesLazyQuery>;
+export type GetViewerPatchesQueryResult = ApolloReactCommon.QueryResult<GetViewerPatchesQuery, GetViewerPatchesQueryVariables>;
 export const GetViewerDocument = gql`
     query GetViewer {
   viewer {

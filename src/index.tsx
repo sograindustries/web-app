@@ -5,10 +5,9 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { createHttpLink } from 'apollo-link-http';
 import { ApolloProvider } from '@apollo/react-hooks';
 import App from './App';
+import { setContext } from 'apollo-link-context';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import ViewerContextProvider from './components/ViewerContextProvider';
-
-const { GRAPHQL_URL } = process.env;
+import ViewerContextProvider, { ViewerConsumer } from './components/ViewerContextProvider';
 
 const theme = createMuiTheme({
     palette: {
@@ -21,19 +20,37 @@ const theme = createMuiTheme({
     },
 });
 
-const client = new ApolloClient({
-    link: createHttpLink({ uri: GRAPHQL_URL }),
-    cache: new InMemoryCache(),
-});
+const authLink = (jwt: string | null) =>
+    setContext((_, { headers }) => {
+        return {
+            headers: {
+                ...headers,
+                authorization: jwt || '',
+            },
+        };
+    });
+
+const getApolloClient = (jwt: string | null) => {
+    const client = new ApolloClient({
+        link: authLink(jwt).concat(createHttpLink({ uri: process.env.GRAPHQL_URL })),
+        cache: new InMemoryCache(),
+    });
+
+    return client;
+};
 
 function Application() {
     return (
         <ViewerContextProvider>
-            <ApolloProvider client={client}>
-                <ThemeProvider theme={theme}>
-                    <App />
-                </ThemeProvider>
-            </ApolloProvider>
+            <ViewerConsumer>
+                {({ viewer }) => (
+                    <ApolloProvider client={getApolloClient(viewer ? viewer.jwt : null)}>
+                        <ThemeProvider theme={theme}>
+                            <App />
+                        </ThemeProvider>
+                    </ApolloProvider>
+                )}
+            </ViewerConsumer>
         </ViewerContextProvider>
     );
 }

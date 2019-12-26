@@ -2,7 +2,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const Dotenv = require('dotenv-webpack');
+const webpack = require('webpack');
 
 module.exports = {
     mode: 'development',
@@ -53,7 +53,9 @@ module.exports = {
     },
 
     plugins: [
-        new Dotenv(),
+        new webpack.DefinePlugin({
+            'process.env.GRAPHQL_URL': JSON.stringify('https://api.argosheart.com/graphql'),
+        }),
         new HtmlWebpackPlugin({
             template: './src/index.html',
         }),
