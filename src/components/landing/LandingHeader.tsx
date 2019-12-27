@@ -17,9 +17,7 @@ function LandingHeader() {
         <div className={classes.root}>
             <div className={classes.title}>
                 <Logo size="md" />
-                <Typography variant="h2" noWrap={true}>
-                    ARGOS HEALTH
-                </Typography>
+                <Typography variant="h4">ARGOS HEALTH</Typography>
             </div>
 
             <Typography variant="h6" style={{ color: '#a2a2a2' }}>

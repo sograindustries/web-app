@@ -2,12 +2,12 @@ import * as React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import HomeIcon from '@material-ui/icons/Home';
+import { useHistory } from 'react-router';
+import { ROUTE_HOME } from '../../App';
 
 const useStyles = makeStyles({
     list: {
@@ -25,6 +25,11 @@ interface Props {
 
 function Drawer(props: Props) {
     const classes = useStyles();
+    const history = useHistory();
+
+    const handleOnHomeClick = () => {
+        history.push(ROUTE_HOME);
+    };
 
     return (
         <div>
@@ -36,21 +41,12 @@ function Drawer(props: Props) {
                     onKeyDown={props.onCloseClick}
                 >
                     <List>
-                        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                            <ListItem button key={text}>
-                                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        ))}
-                    </List>
-                    <Divider />
-                    <List>
-                        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                            <ListItem button key={text}>
-                                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        ))}
+                        <ListItem button onClick={handleOnHomeClick}>
+                            <ListItemIcon>
+                                <HomeIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={'Home'} />
+                        </ListItem>
                     </List>
                 </div>
             </SwipeableDrawer>

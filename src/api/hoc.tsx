@@ -7,7 +7,7 @@ export interface WithApiProps {
 
 const api = createApi();
 
-export const withApi = <P extends {}>(Component: React.ComponentType<P & WithApiProps>) =>
+export const withApi = <P extends {}>(Component: React.ComponentType<P & WithApiProps>): React.ComponentType<P> =>
     class WithApi extends React.Component<P, {}> {
         render() {
             return <Component {...this.props} api={api} />;

@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { Container, CssBaseline } from '@material-ui/core';
-import DeviceList from './DeviceList';
+import { Container } from '@material-ui/core';
+import PatientList from './PatientList';
 
 function HomePage() {
     return (
         <Container>
-            <CssBaseline />
             <main>
-                <DeviceList />
+                <PatientList />
             </main>
         </Container>
     );

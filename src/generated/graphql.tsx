@@ -156,6 +156,8 @@ export type User = {
    __typename?: 'User',
   patches: Array<Patch>,
   patch?: Maybe<Patch>,
+  patients?: Maybe<Array<User>>,
+  readings?: Maybe<Array<Reading>>,
   id: Scalars['Int'],
   username: Scalars['String'],
   firstName?: Maybe<Scalars['String']>,
@@ -166,6 +168,22 @@ export type User = {
 export type UserPatchArgs = {
   id: Scalars['Int']
 };
+
+
+export type UserReadingsArgs = {
+  startUnix?: Maybe<Scalars['Int']>
+};
+
+export type BatteryActivityPartsFragment = (
+  { __typename?: 'Patch' }
+  & { battery: Maybe<(
+    { __typename?: 'Battery' }
+    & Pick<Battery, 'value'>
+  )>, batteryActivity: Maybe<Array<(
+    { __typename?: 'Battery' }
+    & Pick<Battery, 'createdAt' | 'value'>
+  )>> }
+);
 
 export type GetViewerPatchesQueryVariables = {};
 
@@ -181,6 +199,23 @@ export type GetViewerPatchesQuery = (
   )> }
 );
 
+export type GetUserReadingsQueryVariables = {
+  userId: Scalars['Int'],
+  startUnix?: Maybe<Scalars['Int']>
+};
+
+
+export type GetUserReadingsQuery = (
+  { __typename?: 'Query' }
+  & { user: Maybe<(
+    { __typename?: 'User' }
+    & { readings: Maybe<Array<(
+      { __typename?: 'Reading' }
+      & Pick<Reading, 'id' | 'uri'>
+    )>> }
+  )> }
+);
+
 export type GetViewerQueryVariables = {};
 
 
@@ -192,7 +227,149 @@ export type GetViewerQuery = (
   )> }
 );
 
+export type PatchCardStatsOverviewFragment = (
+  { __typename?: 'Patch' }
+  & Pick<Patch, 'readingCount'>
+);
 
+export type GetPatchesFragment = (
+  { __typename?: 'User' }
+  & { patches: Array<(
+    { __typename?: 'Patch' }
+    & Pick<Patch, 'id'>
+    & PatchPartsFragment
+  )> }
+);
+
+export type PatchPartsFragment = (
+  { __typename?: 'Patch' }
+  & Pick<Patch, 'id' | 'bleId' | 'mobileDevice' | 'firmwareVersion' | 'appVersion'>
+  & BatteryActivityPartsFragment
+  & PatchCardStatsOverviewFragment
+);
+
+export type GetPatchSummaryQueryVariables = {
+  id: Scalars['Int']
+};
+
+
+export type GetPatchSummaryQuery = (
+  { __typename?: 'Query' }
+  & { viewer: Maybe<(
+    { __typename?: 'User' }
+    & { patch: Maybe<(
+      { __typename?: 'Patch' }
+      & Pick<Patch, 'id' | 'bleId' | 'readingCount'>
+      & { readings: Maybe<Array<(
+        { __typename?: 'Reading' }
+        & Pick<Reading, 'id' | 'createdAt' | 'uri'>
+      )>> }
+    )> }
+  )> }
+);
+
+export type PatientListItemPatientFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'id' | 'firstName' | 'lastName'>
+);
+
+export type GetViewerPatientsQueryVariables = {};
+
+
+export type GetViewerPatientsQuery = (
+  { __typename?: 'Query' }
+  & { viewer: Maybe<(
+    { __typename?: 'User' }
+    & { patients: Maybe<Array<(
+      { __typename?: 'User' }
+      & PatientListItemPatientFragment
+    )>> }
+  )> }
+);
+
+export type GetPatientQueryVariables = {
+  id: Scalars['Int']
+};
+
+
+export type GetPatientQuery = (
+  { __typename?: 'Query' }
+  & { user: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'firstName' | 'lastName' | 'username'>
+    & GetPatchesFragment
+  )> }
+);
+
+export type ReadingsTableItemFragment = (
+  { __typename?: 'Reading' }
+  & Pick<Reading, 'id' | 'uri'>
+);
+
+export type ReadingsTableReadingsFragment = (
+  { __typename?: 'User' }
+  & { readings: Maybe<Array<(
+    { __typename?: 'Reading' }
+    & ReadingsTableItemFragment
+  )>> }
+);
+
+export const BatteryActivityPartsFragmentDoc = gql`
+    fragment BatteryActivityParts on Patch {
+  battery {
+    value
+  }
+  batteryActivity {
+    createdAt
+    value
+  }
+}
+    `;
+export const PatchCardStatsOverviewFragmentDoc = gql`
+    fragment PatchCardStatsOverview on Patch {
+  readingCount
+}
+    `;
+export const PatchPartsFragmentDoc = gql`
+    fragment PatchParts on Patch {
+  id
+  bleId
+  mobileDevice
+  firmwareVersion
+  appVersion
+  ...BatteryActivityParts
+  ...PatchCardStatsOverview
+}
+    ${BatteryActivityPartsFragmentDoc}
+${PatchCardStatsOverviewFragmentDoc}`;
+export const GetPatchesFragmentDoc = gql`
+    fragment GetPatches on User {
+  patches {
+    id
+    ...PatchParts
+  }
+}
+    ${PatchPartsFragmentDoc}`;
+export const PatientListItemPatientFragmentDoc = gql`
+    fragment PatientListItemPatient on User {
+  id
+  firstName
+  lastName
+}
+    `;
+export const ReadingsTableItemFragmentDoc = gql`
+    fragment ReadingsTableItem on Reading {
+  id
+  uri
+}
+    `;
+export const ReadingsTableReadingsFragmentDoc = gql`
+    fragment ReadingsTableReadings on User {
+  readings {
+    ...ReadingsTableItem
+  }
+}
+    ${ReadingsTableItemFragmentDoc}`;
 export const GetViewerPatchesDocument = gql`
     query GetViewerPatches {
   viewer {
@@ -245,6 +422,60 @@ export function useGetViewerPatchesLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetViewerPatchesQueryHookResult = ReturnType<typeof useGetViewerPatchesQuery>;
 export type GetViewerPatchesLazyQueryHookResult = ReturnType<typeof useGetViewerPatchesLazyQuery>;
 export type GetViewerPatchesQueryResult = ApolloReactCommon.QueryResult<GetViewerPatchesQuery, GetViewerPatchesQueryVariables>;
+export const GetUserReadingsDocument = gql`
+    query GetUserReadings($userId: Int!, $startUnix: Int) {
+  user(id: $userId) {
+    readings(startUnix: $startUnix) {
+      id
+      uri
+    }
+  }
+}
+    `;
+export type GetUserReadingsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<GetUserReadingsQuery, GetUserReadingsQueryVariables>, 'query'> & ({ variables: GetUserReadingsQueryVariables; skip?: boolean; } | { skip: boolean; });
+
+    export const GetUserReadingsComponent = (props: GetUserReadingsComponentProps) => (
+      <ApolloReactComponents.Query<GetUserReadingsQuery, GetUserReadingsQueryVariables> query={GetUserReadingsDocument} {...props} />
+    );
+    
+export type GetUserReadingsProps<TChildProps = {}> = ApolloReactHoc.DataProps<GetUserReadingsQuery, GetUserReadingsQueryVariables> | TChildProps;
+export function withGetUserReadings<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetUserReadingsQuery,
+  GetUserReadingsQueryVariables,
+  GetUserReadingsProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, GetUserReadingsQuery, GetUserReadingsQueryVariables, GetUserReadingsProps<TChildProps>>(GetUserReadingsDocument, {
+      alias: 'getUserReadings',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetUserReadingsQuery__
+ *
+ * To run a query within a React component, call `useGetUserReadingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserReadingsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserReadingsQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      startUnix: // value for 'startUnix'
+ *   },
+ * });
+ */
+export function useGetUserReadingsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUserReadingsQuery, GetUserReadingsQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetUserReadingsQuery, GetUserReadingsQueryVariables>(GetUserReadingsDocument, baseOptions);
+      }
+export function useGetUserReadingsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserReadingsQuery, GetUserReadingsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetUserReadingsQuery, GetUserReadingsQueryVariables>(GetUserReadingsDocument, baseOptions);
+        }
+export type GetUserReadingsQueryHookResult = ReturnType<typeof useGetUserReadingsQuery>;
+export type GetUserReadingsLazyQueryHookResult = ReturnType<typeof useGetUserReadingsLazyQuery>;
+export type GetUserReadingsQueryResult = ApolloReactCommon.QueryResult<GetUserReadingsQuery, GetUserReadingsQueryVariables>;
 export const GetViewerDocument = gql`
     query GetViewer {
   viewer {
@@ -294,3 +525,166 @@ export function useGetViewerLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHo
 export type GetViewerQueryHookResult = ReturnType<typeof useGetViewerQuery>;
 export type GetViewerLazyQueryHookResult = ReturnType<typeof useGetViewerLazyQuery>;
 export type GetViewerQueryResult = ApolloReactCommon.QueryResult<GetViewerQuery, GetViewerQueryVariables>;
+export const GetPatchSummaryDocument = gql`
+    query GetPatchSummary($id: Int!) {
+  viewer {
+    patch(id: $id) {
+      id
+      bleId
+      readingCount
+      readings {
+        id
+        createdAt
+        uri
+      }
+    }
+  }
+}
+    `;
+export type GetPatchSummaryComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<GetPatchSummaryQuery, GetPatchSummaryQueryVariables>, 'query'> & ({ variables: GetPatchSummaryQueryVariables; skip?: boolean; } | { skip: boolean; });
+
+    export const GetPatchSummaryComponent = (props: GetPatchSummaryComponentProps) => (
+      <ApolloReactComponents.Query<GetPatchSummaryQuery, GetPatchSummaryQueryVariables> query={GetPatchSummaryDocument} {...props} />
+    );
+    
+export type GetPatchSummaryProps<TChildProps = {}> = ApolloReactHoc.DataProps<GetPatchSummaryQuery, GetPatchSummaryQueryVariables> | TChildProps;
+export function withGetPatchSummary<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetPatchSummaryQuery,
+  GetPatchSummaryQueryVariables,
+  GetPatchSummaryProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, GetPatchSummaryQuery, GetPatchSummaryQueryVariables, GetPatchSummaryProps<TChildProps>>(GetPatchSummaryDocument, {
+      alias: 'getPatchSummary',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetPatchSummaryQuery__
+ *
+ * To run a query within a React component, call `useGetPatchSummaryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPatchSummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPatchSummaryQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetPatchSummaryQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetPatchSummaryQuery, GetPatchSummaryQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetPatchSummaryQuery, GetPatchSummaryQueryVariables>(GetPatchSummaryDocument, baseOptions);
+      }
+export function useGetPatchSummaryLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetPatchSummaryQuery, GetPatchSummaryQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetPatchSummaryQuery, GetPatchSummaryQueryVariables>(GetPatchSummaryDocument, baseOptions);
+        }
+export type GetPatchSummaryQueryHookResult = ReturnType<typeof useGetPatchSummaryQuery>;
+export type GetPatchSummaryLazyQueryHookResult = ReturnType<typeof useGetPatchSummaryLazyQuery>;
+export type GetPatchSummaryQueryResult = ApolloReactCommon.QueryResult<GetPatchSummaryQuery, GetPatchSummaryQueryVariables>;
+export const GetViewerPatientsDocument = gql`
+    query GetViewerPatients {
+  viewer {
+    patients {
+      ...PatientListItemPatient
+    }
+  }
+}
+    ${PatientListItemPatientFragmentDoc}`;
+export type GetViewerPatientsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<GetViewerPatientsQuery, GetViewerPatientsQueryVariables>, 'query'>;
+
+    export const GetViewerPatientsComponent = (props: GetViewerPatientsComponentProps) => (
+      <ApolloReactComponents.Query<GetViewerPatientsQuery, GetViewerPatientsQueryVariables> query={GetViewerPatientsDocument} {...props} />
+    );
+    
+export type GetViewerPatientsProps<TChildProps = {}> = ApolloReactHoc.DataProps<GetViewerPatientsQuery, GetViewerPatientsQueryVariables> | TChildProps;
+export function withGetViewerPatients<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetViewerPatientsQuery,
+  GetViewerPatientsQueryVariables,
+  GetViewerPatientsProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, GetViewerPatientsQuery, GetViewerPatientsQueryVariables, GetViewerPatientsProps<TChildProps>>(GetViewerPatientsDocument, {
+      alias: 'getViewerPatients',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetViewerPatientsQuery__
+ *
+ * To run a query within a React component, call `useGetViewerPatientsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetViewerPatientsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetViewerPatientsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetViewerPatientsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetViewerPatientsQuery, GetViewerPatientsQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetViewerPatientsQuery, GetViewerPatientsQueryVariables>(GetViewerPatientsDocument, baseOptions);
+      }
+export function useGetViewerPatientsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetViewerPatientsQuery, GetViewerPatientsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetViewerPatientsQuery, GetViewerPatientsQueryVariables>(GetViewerPatientsDocument, baseOptions);
+        }
+export type GetViewerPatientsQueryHookResult = ReturnType<typeof useGetViewerPatientsQuery>;
+export type GetViewerPatientsLazyQueryHookResult = ReturnType<typeof useGetViewerPatientsLazyQuery>;
+export type GetViewerPatientsQueryResult = ApolloReactCommon.QueryResult<GetViewerPatientsQuery, GetViewerPatientsQueryVariables>;
+export const GetPatientDocument = gql`
+    query GetPatient($id: Int!) {
+  user(id: $id) {
+    firstName
+    lastName
+    username
+    ...GetPatches
+  }
+}
+    ${GetPatchesFragmentDoc}`;
+export type GetPatientComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<GetPatientQuery, GetPatientQueryVariables>, 'query'> & ({ variables: GetPatientQueryVariables; skip?: boolean; } | { skip: boolean; });
+
+    export const GetPatientComponent = (props: GetPatientComponentProps) => (
+      <ApolloReactComponents.Query<GetPatientQuery, GetPatientQueryVariables> query={GetPatientDocument} {...props} />
+    );
+    
+export type GetPatientProps<TChildProps = {}> = ApolloReactHoc.DataProps<GetPatientQuery, GetPatientQueryVariables> | TChildProps;
+export function withGetPatient<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetPatientQuery,
+  GetPatientQueryVariables,
+  GetPatientProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, GetPatientQuery, GetPatientQueryVariables, GetPatientProps<TChildProps>>(GetPatientDocument, {
+      alias: 'getPatient',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetPatientQuery__
+ *
+ * To run a query within a React component, call `useGetPatientQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPatientQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPatientQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetPatientQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetPatientQuery, GetPatientQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetPatientQuery, GetPatientQueryVariables>(GetPatientDocument, baseOptions);
+      }
+export function useGetPatientLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetPatientQuery, GetPatientQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetPatientQuery, GetPatientQueryVariables>(GetPatientDocument, baseOptions);
+        }
+export type GetPatientQueryHookResult = ReturnType<typeof useGetPatientQuery>;
+export type GetPatientLazyQueryHookResult = ReturnType<typeof useGetPatientLazyQuery>;
+export type GetPatientQueryResult = ApolloReactCommon.QueryResult<GetPatientQuery, GetPatientQueryVariables>;

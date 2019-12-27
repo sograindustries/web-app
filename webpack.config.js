@@ -4,12 +4,16 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const webpack = require('webpack');
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
 module.exports = {
-    mode: 'development',
+    mode: process.env.NODE_ENV || 'development',
 
     output: {
         path: __dirname + '/dist',
         filename: 'bundle.js',
+        publicPath: '/',
     },
 
     devServer: {
@@ -53,7 +57,9 @@ module.exports = {
     },
 
     plugins: [
+        new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
+            //'process.env.GRAPHQL_URL': JSON.stringify('http://localhost:4000/graphql'),
             'process.env.GRAPHQL_URL': JSON.stringify('https://api.argosheart.com/graphql'),
         }),
         new HtmlWebpackPlugin({
