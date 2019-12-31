@@ -59,8 +59,8 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
-            //'process.env.GRAPHQL_URL': JSON.stringify('http://localhost:4000/graphql'),
-            'process.env.GRAPHQL_URL': JSON.stringify('https://api.argosheart.com/graphql'),
+            'process.env.GRAPHQL_URL': JSON.stringify('http://localhost:4000/graphql'),
+           // 'process.env.GRAPHQL_URL': JSON.stringify('https://api.argosheart.com/graphql'),
         }),
         new HtmlWebpackPlugin({
             template: './src/index.html',

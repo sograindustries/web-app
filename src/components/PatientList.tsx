@@ -70,8 +70,8 @@ function PatientList() {
             <List>
                 {data.viewer.patients.map((patient, i) => (
                     <React.Fragment key={patient.id}>
-                        {i % 2 == 1 && <Divider />}
                         <PatientListItem onClick={() => handleOnPatientItemClick(patient.id)} patient={patient} />
+                        <Divider />
                     </React.Fragment>
                 ))}
             </List>
